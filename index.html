@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atom Collector</title>
+    <style>
+        canvas {
+            background-color: #000;
+            display: block;
+            margin: auto;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Game constants
+        const GRID_SIZE = 40;
+        const PLAYER_SIZE = GRID_SIZE / 2;
+        const MAZE_WIDTH = 15; // Number of cells horizontally
+        const MAZE_HEIGHT = 11; // Number of cells vertically
+        const FPS = 30;
+        const PLAYER_COLOR = '#ffa500'; // Orange
+        const BACKGROUND_COLOR = '#000';
+        const WALL_COLOR = '#4169e1'; // Royal blue
+        const DOT_COLOR = '#ffff00'; // Yellow
+
+        let playerX = canvas.width / 2;
+        let playerY = canvas.height / 2;
+
+        // Maze layout (example)
+        const maze = [
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+            [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1],
+            [1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1],
+            [1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1],
+            [1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1],
+            [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1],
+            [1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1],
+            [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1],
+            [1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1],
+            [1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        ];
+
+        // Draw the maze
+        function drawMaze() {
+            for (let row = 0; row < MAZE_HEIGHT; row++) {
+                for (let col = 0; col < MAZE_WIDTH; col++) {
+                    let cellX = col * GRID_SIZE;
+                    let cellY = row * GRID_SIZE;
+
+                    if (maze[row][col] === 1) {
+                        ctx.fillStyle = WALL_COLOR;
+                        ctx.fillRect(cellX, cellY, GRID_SIZE, GRID_SIZE);
+                    } else {
+                        ctx.fillStyle = DOT_COLOR;
+                        ctx.beginPath();
+                        ctx.arc(cellX + GRID_SIZE / 2, cellY + GRID_SIZE / 2, 3, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                }
+            }
+        }
+
+        // Draw the player
+        function drawPlayer() {
+            ctx.fillStyle = PLAYER_COLOR;
+            ctx.beginPath();
+            ctx.arc(playerX, playerY, PLAYER_SIZE, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        // Update game logic
+        function update() {
+            // Example: Move player with arrow keys
+            if (keys['ArrowUp']) playerY -= GRID_SIZE;
+            if (keys['ArrowDown']) playerY += GRID_SIZE;
+            if (keys['ArrowLeft']) playerX -= GRID_SIZE;
+            if (keys['ArrowRight']) playerX += GRID_SIZE;
+
+            // Ensure player stays within bounds of the maze
+            playerX = Math.max(PLAYER_SIZE, Math.min(playerX, canvas.width - PLAYER_SIZE));
+            playerY = Math.max(PLAYER_SIZE, Math.min(playerY, canvas.height - PLAYER_SIZE));
+        }
+
+        // Clear canvas and redraw everything
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = BACKGROUND_COLOR;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            drawMaze();
+            drawPlayer();
+        }
+
+        // Main game loop
+        function gameLoop() {
+            update();
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Handle keyboard input
+        const keys = {};
+        window.addEventListener('keydown', function(e) {
+            keys[e.key] = true;
+        });
+        window.addEventListener('keyup', function(e) {
+            keys[e.key] = false;
+        });
+
+        // Start the game loop
+        gameLoop();
+    </script>
+</body>
+</html>
